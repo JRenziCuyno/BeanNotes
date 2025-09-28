@@ -77,6 +77,8 @@ Build BeanNotes from the source and install dependencies:
 
 ## Usage
 Open two terminal for your frontend and for the server 
+
+
 Run the project with:
 
 ```
