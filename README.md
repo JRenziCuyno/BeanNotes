@@ -19,8 +19,6 @@ last commit today | javascript 95.2% | languages 3
     * [Prerequisites](#prerequisites)
     * [Installation](#installation)
     * [Usage](#usage)
-* [Testing](#testing)
-
 ---
 
 ## Overview
@@ -53,13 +51,15 @@ Build BeanNotes from the source and install dependencies:
 
 1.  **Clone the repository:**
 
-    ```bash
+    ```
+    bash
     git clone [https://github.com/JRenzicuy/BeanNotes](https://github.com/JRenzicuy/BeanNotes)
     ```
 
 2.  **Navigate to the project directory:**
 
-    ```bash
+    ```
+    bash
     cd BeanNotes
     ```
 
@@ -79,11 +79,13 @@ Build BeanNotes from the source and install dependencies:
 Open two terminal for your frontend and for the server 
 Run the project with:
 
-    cd frontend
-    npm run dev
-    
-    cd ../BeanNotes
-    npx json-server --watch db.json --port 5000
-    ```
-R
+```
+cd frontend
+npm run dev
+```
+```
+cd ../BeanNotes
+npx json-server --watch db.json --port 5000
+```
+
 
