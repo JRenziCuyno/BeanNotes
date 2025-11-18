@@ -59,7 +59,6 @@ Build BeanNotes from the source and install dependencies:
 2.  **Navigate to the project directory:**
 
     ```
-    bash
     cd BeanNotes
     ```
 
@@ -69,7 +68,6 @@ Build BeanNotes from the source and install dependencies:
     
     ```Using **npm**:
     
-    ```bash
     npm install
     ```
 
