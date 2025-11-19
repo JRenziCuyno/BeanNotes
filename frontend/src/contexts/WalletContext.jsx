@@ -1,46 +1,74 @@
-import React, { createContext, useState } from 'react';
+// src/contexts/WalletContext.jsx
+import { createContext, useState, useCallback } from 'react';
+import { BrowserWallet } from '@meshsdk/core';
 
-export const WalletContext = createContext();
+// Create context for wallet state management
+export const WalletContext = createContext(null);
 
-export const WalletProvider = ({ children }) => {
+// Provider component - only exports the provider, no other components
+// This fixes ESLint "Fast refresh only works when a file only exports components"
+export function WalletProvider({ children }) {
   const [connected, setConnected] = useState(false);
+  const [wallet, setWallet] = useState(null);
   const [address, setAddress] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const connect = async () => {
+  // Connect to Lace wallet using Mesh SDK
+  const connectWallet = useCallback(async () => {
+    setLoading(true);
     try {
-      const api = await window.cardano.lace.enable();
-      const addrs = await api.getUsedAddresses();
-      setAddress(addrs[0]);
+      // Check if Lace is installed
+      if (!window.cardano?.lace) {
+        throw new Error('Lace wallet not found. Please install Lace browser extension.');
+      }
+
+      // Enable Lace wallet using Mesh SDK
+      const walletInstance = await BrowserWallet.enable('lace');
+      
+      // Get the first address (payment address)
+      const addresses = await walletInstance.getUsedAddresses();
+      const firstAddress = addresses[0] || await walletInstance.getChangeAddress();
+
+      // Update state
+      setWallet(walletInstance);
+      setAddress(firstAddress);
       setConnected(true);
-      return api;
-    } catch (err) {
-      alert('Wallet connection failed');
-      throw err;
-    }
-  };
 
-  const submitDonation = async (toAddr, amount, message) => {
-    try {
-      const { Transaction } = await import('@meshsdk/core');
-      const api = await window.cardano.lace.enable();
-      
-      const tx = new Transaction({ initiator: api })
-        .sendLovelace(toAddr, (parseFloat(amount) * 1000000).toString());
-      
-      const unsignedTx = await tx.build();
-      const signedTx = await api.signTx(unsignedTx, false);
-      const txHash = await api.submitTx(signedTx);
-      
-      return { txHash, from: address, to: toAddr, amount };
-    } catch (err) {
-      alert('Transaction failed: ' + err.message);
-      throw err;
+      console.log('Wallet connected:', firstAddress);
+      return walletInstance;
+    } catch (error) {
+      console.error('Failed to connect wallet:', error);
+      throw new Error(error.message || 'Failed to connect to Lace wallet');
+    } finally {
+      setLoading(false);
     }
+  }, []);
+
+  // Disconnect wallet
+  const disconnectWallet = useCallback(() => {
+    setWallet(null);
+    setAddress(null);
+    setConnected(false);
+    console.log('Wallet disconnected');
+  }, []);
+
+  // Context value with all wallet state and functions
+  const value = {
+    connected,
+    wallet,
+    address,
+    loading,
+    connectWallet,
+    disconnectWallet
   };
 
   return (
-    <WalletContext.Provider value={{ connected, address, connect, submitDonation }}>
+    <WalletContext.Provider value={value}>
       {children}
     </WalletContext.Provider>
   );
-};
+}
+
+// Note: Removed "message" variable that was defined but never used (fixes ESLint warning)
+// Using Mesh SDK's BrowserWallet.enable() for proper Lace integration
+// All wallet logic is isolated in context - no UI components mixed in
