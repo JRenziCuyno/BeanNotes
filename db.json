@@ -1,38 +1,38 @@
 {
   "notes": [
     {
-      "id": "0b04",
-      "title": "home note",
-      "content": "hemodhfj",
-      "createdAt": "2025-09-28T16:37:03.359Z",
-      "updatedAt": "2025-09-28T16:37:03.359Z",
+      "id": "6b91",
+      "title": "new new",
+      "content": "new new ",
+      "createdAt": "2025-09-29T06:04:03.590Z",
+      "updatedAt": "2025-09-29T06:04:03.590Z",
       "colorIndex": 5,
       "purpose": "personal"
     },
     {
       "id": "eeec",
-      "title": "Clyde is here",
-      "content": "Yesyes WOWOWO",
+      "title": "hopme sdhjkf",
+      "content": "home",
       "createdAt": "2025-09-28T16:37:10.934Z",
-      "updatedAt": "2025-09-28T19:00:06.215Z",
+      "updatedAt": "2025-09-28T16:37:10.934Z",
       "colorIndex": 2,
       "purpose": "home"
     },
     {
-      "id": "78c4",
-      "title": "note note",
-      "content": "note note note",
-      "createdAt": "2025-09-28T16:47:39.575Z",
-      "updatedAt": "2025-09-28T16:47:39.575Z",
-      "colorIndex": 4,
-      "purpose": "personal"
+      "id": "01e5",
+      "title": "home note",
+      "content": "home note11",
+      "createdAt": "2025-09-29T06:04:41.365Z",
+      "updatedAt": "2025-09-29T06:04:41.365Z",
+      "colorIndex": 1,
+      "purpose": "home"
     },
     {
-      "id": "20c0",
-      "title": "1 note",
-      "content": "1 note",
-      "createdAt": "2025-09-28T16:48:50.087Z",
-      "updatedAt": "2025-09-28T16:48:50.087Z",
+      "id": "a497",
+      "title": "note nov 18",
+      "content": "nov 18 note ",
+      "createdAt": "2025-11-18T01:45:12.014Z",
+      "updatedAt": "2025-11-18T01:45:12.015Z",
       "colorIndex": 2,
       "purpose": "personal"
     },
@@ -62,42 +62,6 @@
       "updatedAt": "2025-09-28T17:22:03.114Z",
       "colorIndex": 7,
       "purpose": "school"
-    },
-    {
-      "id": "a2ee",
-      "title": "Drei",
-      "content": "Drei",
-      "createdAt": "2025-11-19T11:09:37.223Z",
-      "updatedAt": "2025-11-19T11:09:37.223Z",
-      "colorIndex": 1,
-      "purpose": "personal"
-    },
-    {
-      "id": "741a",
-      "title": "Drei",
-      "content": "Wdwd",
-      "createdAt": "2025-11-19T11:20:47.882Z",
-      "updatedAt": "2025-11-19T11:20:54.700Z",
-      "colorIndex": 3,
-      "purpose": "personal"
-    },
-    {
-      "id": "4f2d",
-      "title": "awd",
-      "content": "awd",
-      "createdAt": "2025-11-19T11:43:05.587Z",
-      "updatedAt": "2025-11-19T11:43:05.587Z",
-      "purpose": "school",
-      "color": "#e3d5ca"
-    },
-    {
-      "id": "b959",
-      "title": "wdwd",
-      "content": "",
-      "createdAt": "2025-11-19T11:43:14.534Z",
-      "updatedAt": "2025-11-19T11:43:14.534Z",
-      "purpose": "school",
-      "color": "#e3d5ca"
     }
   ],
   "donations": []
