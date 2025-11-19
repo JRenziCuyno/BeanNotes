@@ -79,10 +79,12 @@ Open two terminal for your frontend and for the server
 
 Run the project with:
 
+First Terminal
 ```
 cd frontend
 npm run dev
 ```
+Second Terminal
 ```
 cd ../BeanNotes
 npx json-server --watch db.json --port 5000
