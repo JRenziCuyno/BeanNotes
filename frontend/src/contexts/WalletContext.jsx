@@ -24,11 +24,9 @@ export const WalletProvider = ({ children }) => {
       const { Transaction } = await import('@meshsdk/core');
       const api = await window.cardano.lace.enable();
       
-      // Build transaction using Mesh
       const tx = new Transaction({ initiator: api })
         .sendLovelace(toAddr, (parseFloat(amount) * 1000000).toString());
       
-      // Sign and submit
       const unsignedTx = await tx.build();
       const signedTx = await api.signTx(unsignedTx, false);
       const txHash = await api.submitTx(signedTx);

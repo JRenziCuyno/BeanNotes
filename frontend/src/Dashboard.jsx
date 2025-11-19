@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, Plus, Edit3, Trash2, Save, X, FileText } from 'lucide-react';
 import logo from './assets/logo.png';
+import DonateButton from './components/DonateButton';
 
 const API_BASE = 'http://localhost:5000';
 const API_URL = '/notes';
@@ -274,6 +275,10 @@ const BeanNotes = () => {
         </div>
       </header>
 
+      <div className="max-w-6xl mx-auto mb-6">
+        <DonateButton />
+      </div>
+
       {/* Notes Grid */}
       <main className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredNotes.length === 0 ? (
@@ -302,7 +307,6 @@ const BeanNotes = () => {
                   className="absolute -top-6 -right-10 w-40 h-40 opacity-20 rounded-full"
                   style={{ background: palette.to, pointerEvents: 'none', zIndex: 0 }}
                 />
-
                 <div className="flex justify-between items-start mb-3">
                   <div className="max-w-[70%]">
                     <h3 className="text-lg font-bold leading-tight">{note.title}</h3>
