@@ -1,66 +1,21 @@
 {
   "notes": [
     {
-      "id": "6b91",
-      "title": "new new",
-      "content": "new new ",
-      "createdAt": "2025-09-29T06:04:03.590Z",
-      "updatedAt": "2025-09-29T06:04:03.590Z",
-      "colorIndex": 5,
+      "id": "b988",
+      "title": "new note 1 updated",
+      "content": "new note test 1 updated ",
+      "createdAt": "2025-11-19T20:59:12.870Z",
+      "updatedAt": "2025-11-19T20:59:52.236Z",
+      "colorIndex": 3,
       "purpose": "personal"
     },
     {
-      "id": "eeec",
-      "title": "hopme sdhjkf",
-      "content": "home",
-      "createdAt": "2025-09-28T16:37:10.934Z",
-      "updatedAt": "2025-09-28T16:37:10.934Z",
-      "colorIndex": 2,
-      "purpose": "home"
-    },
-    {
-      "id": "01e5",
-      "title": "home note",
-      "content": "home note11",
-      "createdAt": "2025-09-29T06:04:41.365Z",
-      "updatedAt": "2025-09-29T06:04:41.365Z",
-      "colorIndex": 1,
-      "purpose": "home"
-    },
-    {
-      "id": "a497",
-      "title": "note nov 18",
-      "content": "nov 18 note ",
-      "createdAt": "2025-11-18T01:45:12.014Z",
-      "updatedAt": "2025-11-18T01:45:12.015Z",
-      "colorIndex": 2,
-      "purpose": "personal"
-    },
-    {
-      "id": "a3c7",
-      "title": "new to delete",
-      "content": "i should delete this note",
-      "createdAt": "2025-09-28T16:50:38.285Z",
-      "updatedAt": "2025-09-28T16:50:38.286Z",
-      "colorIndex": 0,
-      "purpose": "personal"
-    },
-    {
-      "id": "ca43",
-      "title": "new note for this version",
-      "content": "sdfghdkjghdfsdas",
-      "createdAt": "2025-09-28T17:07:22.786Z",
-      "updatedAt": "2025-09-28T17:07:22.786Z",
-      "colorIndex": 0,
-      "purpose": "personal"
-    },
-    {
-      "id": "8279",
-      "title": "this is for fucking school",
-      "content": "fucking schoool ",
-      "createdAt": "2025-09-28T17:22:03.114Z",
-      "updatedAt": "2025-09-28T17:22:03.114Z",
-      "colorIndex": 7,
+      "id": "0611",
+      "title": "test 2 note update 1",
+      "content": "test 2 note update 1",
+      "createdAt": "2025-11-19T21:13:00.649Z",
+      "updatedAt": "2025-11-19T21:13:44.756Z",
+      "colorIndex": 4,
       "purpose": "school"
     }
   ],

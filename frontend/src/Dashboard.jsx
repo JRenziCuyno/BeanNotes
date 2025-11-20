@@ -1,9 +1,11 @@
-/* replace your current BeanNotes component with this file (only tiny style changes) */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, Plus, Edit3, Trash2, Save, X, FileText } from 'lucide-react';
 import logo from './assets/logo.png';
-import DonateButton from './components/DonateButton';
+// import DonateButton from './components/DonateButton';
+// import { CardanoWallet } from '@meshsdk/react';
+import { useWallet, CardanoWallet } from '@meshsdk/react';
+import { Transaction } from '@meshsdk/core';
 
 const API_BASE = 'http://localhost:5000';
 const API_URL = '/notes';
@@ -29,6 +31,19 @@ const api = axios.create({
 });
 
 const BeanNotes = () => {
+  //Wallet integration
+  const { wallet, connected, address, name, connecting, error } = useWallet();
+  const [ blockChainStatus, setBlockChainStatus ] = useState('');
+
+  useEffect(() => {
+  if (error) {
+    console.error("Wallet Connection Error:", error);
+  }
+  if (connecting) {
+    console.log("Wallet is trying to connect...");
+  }
+}, [error, connecting]);
+
   const [notes, setNotes] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPurpose, setSelectedPurpose] = useState('all');
@@ -42,6 +57,47 @@ const BeanNotes = () => {
     fetchNotes();
     setDailyQuote(getRandomQuote());
   }, []);
+
+  //sends 1.5 ADA to myself with metadata attached
+  const syncBlockChain = async (action, noteTitle, notedId) => {
+    if (!connected){
+      console.log("Wallet is not connected");
+      return;
+    }
+    try{
+      setBlockChainStatus(`Syncing ${action} to Blockchain`);
+
+      const tx  = new Transaction({ initiator: wallet});
+
+      //A must have so that i have an output on every transaction
+      tx.sendLovelace(address , "1500000");
+      tx.setMetadata(674, {
+        app: 'BeanNotes',
+        action: action, //for the CRUD action (Except Read)
+        id: notedId,
+        title: noteTitle.substring(0, 50) // limit to 50 characters  
+      });
+
+      const unsignedTx = await tx.build();
+      const signedTx = await wallet.signTx(unsignedTx);
+      const txHash = await wallet.submitTx(signedTx);
+
+      console.log(`Blockchain Sync Success: ${txHash}`); // naa ko diri
+
+
+     
+      setBlockChainStatus(`✓ Synced on-chain!`);
+
+       // console.log(`Blockchain Sync Success: ${txHash}`); // naa ko diri part 2 
+       
+      setTimeout(() => setBlockChainStatus(''), 3000);
+
+    }catch (error){
+      console.error('Sync Failed: ', error);
+      setBlockChainStatus('Sync Failed see console');
+    }
+
+    };
 
   const fetchNotes = async () => {
     try {
@@ -63,16 +119,35 @@ const BeanNotes = () => {
       colorIndex: Math.floor(Math.random() * pastelPalettes.length),
       purpose: formData.purpose
     };
+
+
     try {
       const res = await api.post(API_URL, newNote);
-      if (res?.data) setNotes(prev => [res.data, ...prev]);
-      else await fetchNotes();
+      const saveNote = res?.data;
+
+      if(saveNote){
+        setNotes(prev => [saveNote, ...prev]);
+
+        syncBlockChain('CREATE', saveNote.title, saveNote.id);
+
+      }else{
+        await fetchNotes();
+      }
       closeModal();
-    } catch (err) {
-      console.error('Error creating note:', err?.response?.data ?? err.message);
+
+    } catch (err){
+      console.error('Error in create note: ', err?.response?.data ?? err.message);
     } finally {
       setIsSaving(false);
     }
+    //   if (res?.data) setNotes(prev => [res.data, ...prev]);
+    //   else await fetchNotes();
+    //   closeModal();
+    // } catch (err) {
+    //   console.error('Error creating note:', err?.response?.data ?? err.message);
+    // } finally {
+    //   setIsSaving(false);
+    // }
   };
 
   const updateNote = async () => {
@@ -87,27 +162,59 @@ const BeanNotes = () => {
     };
     try {
       const res = await api.put(`${API_URL}/${editingNote.id}`, payload);
-      if (res?.data && res.data.id !== undefined) {
+      
+      if(res?.data && res.data.id !== undefined){
         setNotes(prev => prev.map(n => (n.id === res.data.id ? res.data : n)));
+
+        syncBlockChain('UPDATE', res.data.title, res.data.id);
       } else {
         await fetchNotes();
       }
       closeModal();
     } catch (err) {
-      console.error('Error updating note:', err?.response?.data ?? err.message);
+      console.error('Error on updating note: ', err?.response?.data ?? err.message);
     } finally {
       setIsSaving(false);
     }
+    // try {
+    //   const res = await api.put(`${API_URL}/${editingNote.id}`, payload);
+    //   if (res?.data && res.data.id !== undefined) {
+    //     setNotes(prev => prev.map(n => (n.id === res.data.id ? res.data : n)));
+    //   } else {
+    //     await fetchNotes();
+    //   }
+    //   closeModal();
+    // } catch (err) {
+    //   console.error('Error updating note:', err?.response?.data ?? err.message);
+    // } finally {
+    //   setIsSaving(false);
+    // }
   };
 
   const deleteNote = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this note?')) return;
+    if (!window.confirm('Are you sure you want to delete this note?')) {
+      return;
+    }
+    const noteToDelete = notes.find(n => n.id === id);
+    const titleForChain = noteToDelete ? noteToDelete.title : 'Unknown Note';
+
     try {
       await api.delete(`${API_URL}/${id}`);
-      await fetchNotes();
+
+      setNotes(prev => prev.filter(n => n.id !== id ));
+
+      syncBlockChain('DELETE', titleForChain, id);
     } catch (err) {
-      console.error('Error deleting note:', err?.response?.data ?? err.message);
+      console.error('Error on delete a note: ', err?.response?.data ?? err.message);
+      await fetchNotes();
     }
+
+    // try {
+    //   await api.delete(`${API_URL}/${id}`);
+    //   await fetchNotes();
+    // } catch (err) {
+    //   console.error('Error deleting note:', err?.response?.data ?? err.message);
+    // }
   };
 
   const handleSave = () => {
@@ -231,6 +338,10 @@ const BeanNotes = () => {
           </div>
 
           <div className="flex items-center space-x-3">
+            <div className="z-10"> 
+              {/* We add z-10 so the dropdown menu appears on top of other items */}
+                  <CardanoWallet isDark={false} /> 
+            </div> 
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 opacity-80" />
               <input
@@ -254,6 +365,12 @@ const BeanNotes = () => {
             </button>
           </div>
         </div>
+        {/*this only shows when syncing*/}
+        {blockChainStatus && (
+           <div className="mt-2 text-xs font-mono p-1 rounded text-center bg-white/50 text-purple-900">
+             ⚡ {blockChainStatus}
+           </div>
+        )}
 
         {/* Purpose filters */}
         <div className="mt-4 flex items-center gap-3">
@@ -275,9 +392,9 @@ const BeanNotes = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto mb-6">
+      {/* <div className="max-w-6xl mx-auto mb-6">
         <DonateButton />
-      </div>
+      </div> */}
 
       {/* Notes Grid */}
       <main className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
