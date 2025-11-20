@@ -59,7 +59,6 @@ Build BeanNotes from the source and install dependencies:
 2.  **Navigate to the project directory:**
 
     ```
-    bash
     cd BeanNotes
     ```
 
@@ -69,7 +68,6 @@ Build BeanNotes from the source and install dependencies:
     
     ```Using **npm**:
     
-    ```bash
     npm install
     ```
 
@@ -81,10 +79,12 @@ Open two terminal for your frontend and for the server
 
 Run the project with:
 
+First Terminal
 ```
 cd frontend
 npm run dev
 ```
+Second Terminal
 ```
 cd ../BeanNotes
 npx json-server --watch db.json --port 5000
