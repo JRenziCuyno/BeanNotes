@@ -1,7 +1,7 @@
 // src/components/DonateButton.jsx
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Coffee, Wallet, Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { WalletContext } from '../contexts/WalletContext';
+import { useWallet } from '@meshsdk/react';
 import { Transaction } from '@meshsdk/core';
 
 // === ADA ↔ LOVELACE CONVERSION CONSTANTS & HELPERS ===
@@ -12,18 +12,14 @@ const adaToLovelace = (ada) => {
   return Math.floor(ada * LOVELACE_PER_ADA).toString();
 };
 
-// Convert lovelace to ADA
-const lovelaceToAda = (lovelace) => {
-  return (parseInt(lovelace) / LOVELACE_PER_ADA).toFixed(6);
-};
-
 // Format ADA for display (removes trailing zeros)
 const formatAda = (ada) => {
   return parseFloat(ada).toString();
 };
 
 const DonateButton = () => {
-  const { connected, wallet, address, loading: walletLoading, connectWallet } = useContext(WalletContext);
+  // Use Mesh SDK's built-in wallet hook directly (NO custom WalletContext)
+  const { wallet, connected, connect } = useWallet();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -48,12 +44,13 @@ const DonateButton = () => {
     setTimeout(() => setShowAlert(false), 5000);
   };
 
-  // Handle wallet connection
+  // Handle wallet connection using Mesh SDK
   const handleConnectWallet = async () => {
     try {
-      await connectWallet();
+      await connect('lace'); // Connect to Lace wallet
       showAlertMessage('Wallet connected successfully!');
     } catch (error) {
+      console.error('Wallet connection error:', error);
       showAlertMessage(error.message || 'Failed to connect wallet', 'error');
     }
   };
@@ -74,11 +71,10 @@ const DonateButton = () => {
       }
 
       console.log('Building transaction...');
-      console.log('From:', address);
       console.log('To:', DONATION_ADDRESS);
       console.log(`Amount: ${formatAda(DONATION_AMOUNT_ADA)} ADA (${DONATION_AMOUNT_LOVELACE} lovelace)`);
 
-      // Build transaction using Mesh SDK
+      // Build transaction using Mesh SDK directly
       const tx = new Transaction({ initiator: wallet });
       
       // Add output: send lovelace to donation address (blockchain uses lovelace)
@@ -150,12 +146,12 @@ const DonateButton = () => {
       {/* Donate button - displays ADA amount */}
       <button
         onClick={handleDonate}
-        disabled={walletLoading || isProcessing}
+        disabled={isProcessing}
         className="group relative px-6 py-3 rounded-full font-bold shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          opacity: (walletLoading || isProcessing) ? 0.7 : 1,
-          cursor: (walletLoading || isProcessing) ? 'not-allowed' : 'pointer'
+          opacity: isProcessing ? 0.7 : 1,
+          cursor: isProcessing ? 'not-allowed' : 'pointer'
         }}
       >
         {/* Animated background on hover */}
@@ -165,10 +161,10 @@ const DonateButton = () => {
         
         {/* Button content - all amounts displayed in ADA */}
         <div className="relative flex items-center space-x-3 text-white">
-          {walletLoading || isProcessing ? (
+          {isProcessing ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>{isProcessing ? 'Processing...' : 'Connecting...'}</span>
+              <span>Processing...</span>
             </>
           ) : connected ? (
             <>
@@ -183,23 +179,17 @@ const DonateButton = () => {
           )}
         </div>
       </button>
-
-      {/* Wallet connection status (displays address, amount in ADA) */}
-      {connected && address && (
-        <p className="text-xs mt-2 text-gray-600 truncate" style={{ maxWidth: '300px' }}>
-          Connected: {address.substring(0, 20)}...
-        </p>
-      )}
     </div>
   );
 };
 
 export default DonateButton;
 
-// === CONVERSION SUMMARY ===
-// 1. adaToLovelace(): Converts ADA → lovelace for blockchain transactions
-// 2. lovelaceToAda(): Converts lovelace → ADA for display/confirmation
-// 3. formatAda(): Formats ADA values for clean UI display (removes trailing zeros)
-// 4. All UI displays show ADA amounts (user-friendly)
-// 5. All blockchain transactions use lovelace (protocol requirement)
-// 6. Constants: LOVELACE_PER_ADA = 1,000,000 (1 ADA = 1,000,000 lovelace)
+// === REFACTOR NOTES ===
+// ✅ Removed WalletContext completely
+// ✅ Using Mesh SDK's useWallet() hook directly
+// ✅ No middleman/wrapper causing double initialization
+// ✅ ADA ↔ lovelace conversion maintained
+// ✅ All UI displays ADA, blockchain sends lovelace
+// ✅ No unused variables (ESLint clean)
+// ✅ Compatible with Vite + vite-plugin-node-polyfills
