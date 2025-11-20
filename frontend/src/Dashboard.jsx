@@ -19,7 +19,7 @@ const pastelPalettes = [
   { from: '#FFEFE6', to: '#FFD3C4', text: '#4B1A00' },
   { from: '#E6FFF2', to: '#CFFFE0', text: '#004D40' },
   { from: '#FFEAF6', to: '#FFD9F0', text: '#2C0F1E' }
-];
+]; 
 
 const getPalette = (index = 0) => pastelPalettes[index % pastelPalettes.length];
 const PURPOSES = ['all', 'school', 'personal', 'home'];
@@ -89,7 +89,7 @@ const BeanNotes = () => {
       setBlockChainStatus(`✓ Synced on-chain!`);
 
        // console.log(`Blockchain Sync Success: ${txHash}`); // naa ko diri part 2 
-       
+
       setTimeout(() => setBlockChainStatus(''), 3000);
 
     }catch (error){
