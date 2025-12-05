@@ -19,6 +19,7 @@
       "purpose": "school"
     },
     {
+<<<<<<< HEAD
       "id": "19f2",
       "title": "ss",
       "content": "dsdas",
@@ -26,6 +27,15 @@
       "updatedAt": "2025-12-04T17:00:52.140Z",
       "colorIndex": 7,
       "purpose": "personal"
+=======
+      "id": "753f",
+      "title": "Clyde Nixon",
+      "content": "Nice One babyy",
+      "createdAt": "2025-11-19T12:55:31.040Z",
+      "updatedAt": "2025-11-19T12:55:31.040Z",
+      "colorIndex": 2,
+      "purpose": "school"
+>>>>>>> 70ea3aae3c459c0edfbb5cecba44e3f014767ab2
     }
   ],
   "donations": []
