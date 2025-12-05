@@ -1,4 +1,3 @@
-// src/components/DonateButton.jsx
 import { useState } from 'react';
 import { Coffee, Wallet, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useWallet } from '@meshsdk/react';
@@ -18,22 +17,16 @@ const formatAda = (ada) => {
 };
 
 const DonateButton = () => {
-  // Use Mesh SDK's built-in wallet hook directly (NO custom WalletContext)
-  const { wallet, connected, connect } = useWallet();
+  // We use the connected wallet's own address as the recipient for the simulation
+  const { wallet, connected, address } = useWallet();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('success'); // 'success' or 'error'
-
-  // Your donation recipient address (replace with your actual preprod testnet address)
-  const DONATION_ADDRESS = import.meta.env.VITE_DONATION_ADDRESS || 
-    'addr_test1qz...your_preprod_address_here';
   
-  // Donation amount in ADA (this is what users see)
+  // Donation amount in ADA
   const DONATION_AMOUNT_ADA = 2;
-  
-  // Convert to lovelace for blockchain transaction
   const DONATION_AMOUNT_LOVELACE = adaToLovelace(DONATION_AMOUNT_ADA);
 
   // Display alert for 5 seconds
@@ -44,76 +37,65 @@ const DonateButton = () => {
     setTimeout(() => setShowAlert(false), 5000);
   };
 
-  // Handle wallet connection using Mesh SDK
-  const handleConnectWallet = async () => {
-    try {
-      await connect('lace'); // Connect to Lace wallet
-      showAlertMessage('Wallet connected successfully!');
-    } catch (error) {
-      console.error('Wallet connection error:', error);
-      showAlertMessage(error.message || 'Failed to connect wallet', 'error');
-    }
-  };
-
-  // Build and submit donation transaction
   const handleDonate = async () => {
-    // Connect wallet first if not connected
+    // CHECK: If not connected, prompt user to use the main wallet button
     if (!connected) {
-      await handleConnectWallet();
+      showAlertMessage('Please connect your wallet at the top first!', 'error');
+      return;
+    }
+    
+    // CHECK: If connected but address hasn't loaded yet
+    if (!address) {
+      showAlertMessage('Wallet loading... please wait a moment.', 'error');
       return;
     }
 
     setIsProcessing(true);
     try {
-      // Validate wallet instance
       if (!wallet) {
         throw new Error('Wallet not initialized');
       }
 
-      console.log('Building transaction...');
-      console.log('To:', DONATION_ADDRESS);
-      console.log(`Amount: ${formatAda(DONATION_AMOUNT_ADA)} ADA (${DONATION_AMOUNT_LOVELACE} lovelace)`);
+      // SIMULATION: We set the recipient to be YOU (the connected user)
+      const recipientAddress = address;
 
-      // Build transaction using Mesh SDK directly
+      console.log('Building Simulation Transaction...');
+      console.log('From (You):', address);
+      console.log('To (You - Self Transaction):', recipientAddress);
+
       const tx = new Transaction({ initiator: wallet });
       
-      // Add output: send lovelace to donation address (blockchain uses lovelace)
-      tx.sendLovelace(DONATION_ADDRESS, DONATION_AMOUNT_LOVELACE);
+      try {
+        // Send lovelace to your own address
+        tx.sendLovelace(recipientAddress, DONATION_AMOUNT_LOVELACE);
+      } catch (addrError) {
+         console.error("Address Error:", addrError);
+         throw new Error("Invalid Address format.");
+      }
 
-      // Build the unsigned transaction
       const unsignedTx = await tx.build();
-      console.log('Transaction built successfully');
-
-      // Sign the transaction
       const signedTx = await wallet.signTx(unsignedTx);
-      console.log('Transaction signed successfully');
-
-      // Submit the signed transaction
       const txHash = await wallet.submitTx(signedTx);
-      console.log('Transaction submitted:', txHash);
 
-      // Show success message with ADA amount (user-friendly display)
+      console.log(`Simulation sent with hash ${txHash}`);
+
       showAlertMessage(
-        `Thank you for your ${formatAda(DONATION_AMOUNT_ADA)} ADA donation! Tx: ${txHash.substring(0, 16)}...`,
+        `Simulation Successful! Sent ${formatAda(DONATION_AMOUNT_ADA)} ADA to yourself.`,
         'success'
       );
-
-      // Optional: Log full transaction details with both ADA and lovelace
-      console.log('Full tx hash:', txHash);
-      console.log(`Amount sent: ${formatAda(DONATION_AMOUNT_ADA)} ADA (${DONATION_AMOUNT_LOVELACE} lovelace)`);
-      console.log(`View on CardanoScan: https://preprod.cardanoscan.io/transaction/${txHash}`);
 
     } catch (error) {
       console.error('Donation failed:', error);
       
-      // User-friendly error messages
       let errorMsg = 'Transaction failed. Please try again.';
-      if (error.message?.includes('insufficient')) {
-        errorMsg = `Insufficient funds. You need at least ${formatAda(DONATION_AMOUNT_ADA)} ADA plus transaction fees.`;
-      } else if (error.message?.includes('reject') || error.message?.includes('cancel')) {
+      const errorString = typeof error === 'string' ? error : JSON.stringify(error);
+
+      if (errorString.includes('insufficient') || error.message?.includes('insufficient')) {
+        errorMsg = `Insufficient funds. You need at least ${formatAda(DONATION_AMOUNT_ADA)} ADA + fees.`;
+      } else if (errorString.includes('reject') || errorString.includes('cancel')) {
         errorMsg = 'Transaction was cancelled.';
-      } else if (error.info) {
-        errorMsg = `Transaction failed: ${error.info}`;
+      } else if (error.message) {
+        errorMsg = `Error: ${error.message}`;
       }
       
       showAlertMessage(errorMsg, 'error');
@@ -143,7 +125,6 @@ const DonateButton = () => {
         </div>
       )}
 
-      {/* Donate button - displays ADA amount */}
       <button
         onClick={handleDonate}
         disabled={isProcessing}
@@ -154,27 +135,24 @@ const DonateButton = () => {
           cursor: isProcessing ? 'not-allowed' : 'pointer'
         }}
       >
-        {/* Animated background on hover */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        />
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
-        {/* Button content - all amounts displayed in ADA */}
         <div className="relative flex items-center space-x-3 text-white">
           {isProcessing ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
               <span>Processing...</span>
             </>
-          ) : connected ? (
-            <>
-              <Coffee className="w-5 h-5" />
-              <span>Buy Me a Coffee ({formatAda(DONATION_AMOUNT_ADA)} ADA)</span>
-            </>
           ) : (
             <>
-              <Wallet className="w-5 h-5" />
-              <span>Connect Wallet to Donate</span>
+              {/* Icons change based on state, but button always attempts donate now */}
+              {connected ? <Coffee className="w-5 h-5" /> : <Wallet className="w-5 h-5" />}
+              
+              <span>
+                {connected 
+                  ? `Simulate Donate (${formatAda(DONATION_AMOUNT_ADA)} ADA)` 
+                  : 'Connect Wallet to Simulate'}
+              </span>
             </>
           )}
         </div>
@@ -184,12 +162,3 @@ const DonateButton = () => {
 };
 
 export default DonateButton;
-
-// === REFACTOR NOTES ===
-// ✅ Removed WalletContext completely
-// ✅ Using Mesh SDK's useWallet() hook directly
-// ✅ No middleman/wrapper causing double initialization
-// ✅ ADA ↔ lovelace conversion maintained
-// ✅ All UI displays ADA, blockchain sends lovelace
-// ✅ No unused variables (ESLint clean)
-// ✅ Compatible with Vite + vite-plugin-node-polyfills
